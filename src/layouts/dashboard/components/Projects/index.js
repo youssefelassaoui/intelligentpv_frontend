@@ -163,7 +163,7 @@ function Projects() {
   return (
     <Card>
       <MDBox
-        height="525px"
+        height="400px"
         sx={({ borders: { borderRadius } }) => ({
           borderRadius: borderRadius.lg,
           overflow: "hidden",

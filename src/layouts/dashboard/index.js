@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import { fetchProductionEnergyData } from "layouts/dashboard/data/productionEnergyData";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import Projects from "layouts/dashboard/components/Projects";
+import KpiLineChart from "layouts/dashboard/components/Kpis/linechart";
 
 function Dashboard() {
   const [startDate, setStartDate] = useState("2024-05-10");
@@ -19,12 +20,18 @@ function Dashboard() {
   const handleFetchData = async () => {
     const data = await fetchProductionEnergyData();
 
+    // Process and filter the data to ensure no null values are causing issues
     const filteredData = Object.entries(data)
       .filter(
         ([date]) => new Date(date) >= new Date(startDate) && new Date(date) <= new Date(endDate)
       )
       .reduce((obj, [key, value]) => {
-        obj[key] = value;
+        obj[key] = {
+          "Hospital Universitario Reina Sofía": value["Hospital Universitario Reina Sofía"] || 0,
+          GSBP: value["GSBP"] || 0,
+          "Musée Mohammed VI d'art moderne et contemporain":
+            value["Musée Mohammed VI d'art moderne et contemporain"] || 0,
+        };
         return obj;
       }, {});
 
@@ -52,19 +59,13 @@ function Dashboard() {
       },
     ];
 
-    const combinedData = labels.map((_, index) => {
-      return datasets.map((dataset) => dataset.data[index]);
-    });
-
-    const stackedDatasets = datasets.map((dataset, datasetIndex) => ({
-      ...dataset,
-      data: combinedData.map((data) => data[datasetIndex]),
-    }));
-
     setChartData({
       labels,
-      datasets: stackedDatasets,
+      datasets,
     });
+
+    console.log("Filtered Data:", filteredData); // Log the filtered data for debugging
+    console.log("Chart Data:", { labels, datasets }); // Log the chart data for debugging
   };
 
   useEffect(() => {
@@ -76,8 +77,8 @@ function Dashboard() {
       <DashboardNavbar />
       <MDBox py={3} px={1.5}>
         <MDBox mt={3}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={6}>
               <Card>
                 <MDBox p={2}>
                   <MDBox mt={2}>
@@ -155,19 +156,19 @@ function Dashboard() {
                 </MDBox>
               </Card>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3.4}>
               <OrdersOverview />
             </Grid>
           </Grid>
         </MDBox>
-        <MDBox mt={2}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
+        <MDBox mt={1}>
+          <Grid container spacing={1} alignItems="center">
+            <Grid item xs={12} md={7}>
               <Projects />
             </Grid>
-            <Grid item xs={12} md={4}>
-              <OrdersOverview />
-            </Grid>
+            {/* <Grid item xs={12} md={5}>
+              <KpiLineChart startDate={startDate} endDate={endDate} />
+            </Grid> */}
           </Grid>
         </MDBox>
       </MDBox>

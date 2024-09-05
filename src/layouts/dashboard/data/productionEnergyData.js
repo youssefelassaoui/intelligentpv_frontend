@@ -15,10 +15,10 @@ export const fetchProductionEnergyData = async () => {
     rawData.forEach((item) => {
       const date = item.key?.datetime?.split("T")[0]; // Safely access date
       const plantName = item.plantName;
-      const dayEnergy = item.dayEnergy;
+      const dayEnergy = item.dayEnergy || 0; // Ensure dayEnergy is a valid number
 
       if (date && plantName) {
-        // Check if date and plantName exist
+        // Initialize the date if not present
         if (!processedData[date]) {
           processedData[date] = {
             "Hospital Universitario Reina Sofía": 0,
@@ -27,9 +27,12 @@ export const fetchProductionEnergyData = async () => {
           };
         }
 
-        processedData[date][plantName] += dayEnergy || 0; // Ensure dayEnergy is a valid number
+        // Sum up the dayEnergy for each plantName per date
+        processedData[date][plantName] += dayEnergy;
       }
     });
+
+    console.log("Processed Data:", processedData); // Log the processed data for debugging
 
     return processedData;
   } catch (error) {
