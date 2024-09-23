@@ -65,14 +65,22 @@ const routes = [
     route: "/tables",
     component: <Tables />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Billing",
-  //   key: "billing",
-  //   icon: <Icon fontSize="small">receipt_long</Icon>,
-  //   route: "/billing",
-  //   component: <Billing />,
-  // },
+  {
+    type: "collapse",
+    name: "Billing",
+    key: "billing",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/billing",
+    component: <Billing />,
+  },
+  {
+    type: "collapse",
+    name: "View System",
+    key: "view-system",
+    route: "/tables/:systemName", // dynamic route for system details
+    component: <Tables />,
+    icon: null, // This route will not show in the side menu
+  },
   // {
   //   type: "collapse",
   //   name: "RTL",

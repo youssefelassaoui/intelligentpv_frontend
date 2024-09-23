@@ -88,7 +88,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <Grid container alignItems="center" justifyContent="center" sx={{ flexGrow: 1 }}>
           <Stack direction="row" spacing={5} sx={{ position: "relative" }}>
             {renderLink("/dashboard", "dashboard", "Overview")}
-            {renderLink("/tables", "table_view", "Centrales Details")}
+            {renderLink("/tables", "table_view", "Plants Details")}
           </Stack>
         </Grid>
 

@@ -8,12 +8,13 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Line } from "react-chartjs-2";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { useParams } from "react-router-dom"; // Import useParams for dynamic routing
 import axios from "axios";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import MeasureBarChart from "./MeasureBarChart"; // Import MeasureBarChart
-import MeasureDataGrid from "./MeasureDataGrid"; // Import MeasureDataGrid
+import MeasureLineChart from "./MeasureLineChart";
+import MeasureDataGrid from "./MeasureDataGrid";
 
 const fetchPlantData = async (plantName, startDate, endDate) => {
   try {
@@ -39,23 +40,9 @@ const fetchPlantData = async (plantName, startDate, endDate) => {
     }));
 
     return {
-      chartData: {
-        labels,
-        datasets: [
-          {
-            label: "Day Energy (kWh)",
-            data: dayEnergyData,
-            borderColor: "#3e95cd",
-            fill: false,
-          },
-          {
-            label: "Total String Power (kW)",
-            data: totalStringPowerData,
-            borderColor: "#8e5ea2",
-            fill: false,
-          },
-        ],
-      },
+      labels,
+      dayEnergyData,
+      totalStringPowerData,
       rows,
     };
   } catch (error) {
@@ -65,27 +52,82 @@ const fetchPlantData = async (plantName, startDate, endDate) => {
 };
 
 function Tables() {
+  const { systemName } = useParams(); // Capture system name from URL
   const [selectedTab, setSelectedTab] = useState("GSBP");
-  const [startDate, setStartDate] = useState("2024-05-10");
-  const [endDate, setEndDate] = useState("2024-05-20");
-  const [chartData, setChartData] = useState(null);
+  const [startDate1, setStartDate1] = useState("2024-05-10");
+  const [endDate1, setEndDate1] = useState("2024-05-20");
+  const [startDate2, setStartDate2] = useState("2024-05-10");
+  const [endDate2, setEndDate2] = useState("2024-05-20");
+  const [chartData1, setChartData1] = useState(null);
+  const [chartData2, setChartData2] = useState(null);
   const [rows, setRows] = useState([]);
+
+  // Map system names to tab values
+  const plantTabMapping = {
+    GSBP: "GSBP",
+    "Hospital Universitario Reina Sofía": "Hospital Universitario Reina Sofía",
+    "Musée Mohammed VI d'art moderne": "Musée Mohammed VI d'art moderne et contemporain",
+  };
+  const plantIdMapping = {
+    GSBP: 1,
+    "Hospital Universitario Reina Sofía": 2,
+    "Musée Mohammed VI d'art moderne et contemporain": 3,
+  };
+
+  // Set the selectedTab based on the systemName from URL when the component mounts
+  useEffect(() => {
+    if (systemName && plantTabMapping[systemName]) {
+      setSelectedTab(plantTabMapping[systemName]);
+    }
+  }, [systemName]);
 
   const handleChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const handleFetchData = async () => {
-    const data = await fetchPlantData(selectedTab, startDate, endDate);
+  const handleFetchData1 = async () => {
+    const data = await fetchPlantData(selectedTab, startDate1, endDate1);
     if (data) {
-      setChartData(data.chartData);
+      setChartData1({
+        labels: data.labels,
+        datasets: [
+          {
+            label: "Day Energy (kWh)",
+            data: data.dayEnergyData,
+            borderColor: "#3e95cd",
+            fill: false,
+          },
+        ],
+      });
+      setRows(data.rows);
+    }
+  };
+
+  const handleFetchData2 = async () => {
+    const data = await fetchPlantData(selectedTab, startDate2, endDate2);
+    if (data) {
+      setChartData2({
+        labels: data.labels,
+        datasets: [
+          {
+            label: "Total String Power (kW)",
+            data: data.totalStringPowerData,
+            borderColor: "#8e5ea2",
+            fill: false,
+          },
+        ],
+      });
       setRows(data.rows);
     }
   };
 
   useEffect(() => {
-    handleFetchData();
-  }, [selectedTab, startDate, endDate]);
+    handleFetchData1();
+  }, [selectedTab, startDate1, endDate1]);
+
+  useEffect(() => {
+    handleFetchData2();
+  }, [selectedTab, startDate2, endDate2]);
 
   const columns = [
     { field: "datetime", headerName: "Datetime", flex: 1 },
@@ -93,18 +135,12 @@ function Tables() {
     { field: "totalStringPower", headerName: "Total String Power (kW)", flex: 1 },
   ];
 
-  // Map tab values to plantIds
-  const plantTabMapping = {
-    GSBP: 1,
-    "Hospital Universitario Reina Sofía": 2,
-    "Musée Mohammed VI d'art moderne et contemporain": 3,
-  };
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={7} pb={3}>
+      <MDBox pt={7} pb={7}>
         <Grid container spacing={3}>
+          {/* Tab Selection */}
           <Grid item xs={12}>
             <Card>
               <MDBox pt={3} px={3}>
@@ -149,6 +185,7 @@ function Tables() {
             </Card>
           </Grid>
 
+          {/* Day Energy Chart with Filters */}
           <Grid item xs={12} md={6}>
             <Card>
               <MDBox p={2}>
@@ -157,8 +194,8 @@ function Tables() {
                     <TextField
                       label="Start Date"
                       type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      value={startDate1}
+                      onChange={(e) => setStartDate1(e.target.value)}
                       InputLabelProps={{ shrink: true }}
                       fullWidth
                     />
@@ -167,8 +204,8 @@ function Tables() {
                     <TextField
                       label="End Date"
                       type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      value={endDate1}
+                      onChange={(e) => setEndDate1(e.target.value)}
                       InputLabelProps={{ shrink: true }}
                       fullWidth
                     />
@@ -176,7 +213,7 @@ function Tables() {
                   <Grid item xs={2}>
                     <Button
                       variant="contained"
-                      onClick={handleFetchData}
+                      onClick={handleFetchData1}
                       fullWidth
                       sx={{
                         backgroundColor: "green",
@@ -191,9 +228,9 @@ function Tables() {
                   </Grid>
                 </Grid>
                 <MDBox mt={2}>
-                  {chartData && (
+                  {chartData1 && (
                     <Line
-                      data={chartData}
+                      data={chartData1}
                       options={{
                         responsive: true,
                         plugins: {
@@ -202,7 +239,7 @@ function Tables() {
                           },
                           title: {
                             display: true,
-                            text: `Day Energy and Total String Power (${selectedTab})`,
+                            text: `Day Energy (${selectedTab})`,
                           },
                         },
                         scales: {
@@ -215,7 +252,7 @@ function Tables() {
                           y: {
                             title: {
                               display: true,
-                              text: "Values",
+                              text: "Day Energy (kWh)",
                             },
                           },
                         },
@@ -227,7 +264,87 @@ function Tables() {
             </Card>
           </Grid>
 
+          {/* Total String Power Chart with Filters */}
           <Grid item xs={12} md={6}>
+            <Card>
+              <MDBox p={2}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={5}>
+                    <TextField
+                      label="Start Date"
+                      type="date"
+                      value={startDate2}
+                      onChange={(e) => setStartDate2(e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={5}>
+                    <TextField
+                      label="End Date"
+                      type="date"
+                      value={endDate2}
+                      onChange={(e) => setEndDate2(e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Button
+                      variant="contained"
+                      onClick={handleFetchData2}
+                      fullWidth
+                      sx={{
+                        backgroundColor: "green",
+                        color: "white !important",
+                        "&:hover": {
+                          backgroundColor: "darkgreen",
+                        },
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </Grid>
+                </Grid>
+                <MDBox mt={2}>
+                  {chartData2 && (
+                    <Line
+                      data={chartData2}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: "top",
+                          },
+                          title: {
+                            display: true,
+                            text: `Total String Power (${selectedTab})`,
+                          },
+                        },
+                        scales: {
+                          x: {
+                            title: {
+                              display: true,
+                              text: "Time",
+                            },
+                          },
+                          y: {
+                            title: {
+                              display: true,
+                              text: "Total String Power (kW)",
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </MDBox>
+              </MDBox>
+            </Card>
+          </Grid>
+
+          {/* Data Grid */}
+          {/* <Grid item xs={12}>
             <Card>
               <MDBox p={2}>
                 <div style={{ height: 400, width: "100%" }}>
@@ -249,23 +366,20 @@ function Tables() {
                 </div>
               </MDBox>
             </Card>
+          </Grid> */}
+
+          {/* Other Components */}
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={6}>
+              {/* Call MeasureLineChart instead of MeasureBarChart */}
+              <MeasureLineChart plantId={plantIdMapping[selectedTab]} />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <MeasureDataGrid plantId={plantIdMapping[selectedTab]} />
+            </Grid>
           </Grid>
         </Grid>
-        <MDBox mt={1}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <MeasureBarChart plantId={plantTabMapping[selectedTab]} /> {/* Pass plantId */}
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <MeasureDataGrid
-                plantId={plantTabMapping[selectedTab]}
-                startDate={startDate}
-                endDate={endDate}
-              />{" "}
-              {/* Pass plantId, startDate, and endDate */}
-            </Grid>
-          </Grid>
-        </MDBox>
       </MDBox>
     </DashboardLayout>
   );

@@ -7,20 +7,25 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { Bar } from "react-chartjs-2";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { fetchProductionEnergyData } from "layouts/dashboard/data/productionEnergyData";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import Projects from "layouts/dashboard/components/Projects";
-import KpiLineChart from "layouts/dashboard/components/Kpis/linechart";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PowerIcon from "@mui/icons-material/Power";
+import StorageIcon from "@mui/icons-material/Storage";
+import OnduleurComponent from "layouts/dashboard/components/OnduleurComponent";
 
-function Dashboard() {
+const Dashboard = () => {
   const [startDate, setStartDate] = useState("2024-05-10");
   const [endDate, setEndDate] = useState("2024-05-20");
   const [chartData, setChartData] = useState(null);
 
+  const navigate = useNavigate(); // Initialize navigate for redirection
+
   const handleFetchData = async () => {
     const data = await fetchProductionEnergyData();
 
-    // Process and filter the data to ensure no null values are causing issues
     const filteredData = Object.entries(data)
       .filter(
         ([date]) => new Date(date) >= new Date(startDate) && new Date(date) <= new Date(endDate)
@@ -63,19 +68,294 @@ function Dashboard() {
       labels,
       datasets,
     });
-
-    console.log("Filtered Data:", filteredData); // Log the filtered data for debugging
-    console.log("Chart Data:", { labels, datasets }); // Log the chart data for debugging
   };
 
   useEffect(() => {
     handleFetchData();
   }, [startDate, endDate]);
 
+  // Function to handle navigation to the Tables component with system name
+  const handleViewDetails = (systemName) => {
+    navigate(`/tables/${systemName}`); // Navigate to the dynamic route with system name
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3} px={1.5}>
+        <MDBox mt={3}>
+          <Grid container spacing={3}>
+            {/* GSBP Card */}
+            <Grid item xs={12} md={3}>
+              <Card>
+                <MDBox p={2}>
+                  <img
+                    src="/plantimage.png"
+                    alt="Photovoltaic System 1"
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <MDBox mt={1}>
+                    <h5 style={{ fontSize: "16px", margin: "0" }}>GSBP</h5>
+
+                    {/* Location */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <LocationOnIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Location:</b> Ben Guerir 43150, Morocco
+                      </p>
+                    </MDBox>
+
+                    {/* Capacity */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Capacity:</b> 500 kW
+                      </p>
+                    </MDBox>
+
+                    {/* Strings */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <StorageIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Strings:</b> 90
+                      </p>
+                    </MDBox>
+
+                    <MDBox mt={2} display="flex" justifyContent="flex-end">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#B4E4FF",
+                          color: "black !important",
+                          "&:hover": { backgroundColor: "#1C82AD" },
+                        }}
+                        onClick={() => handleViewDetails("GSBP")} // Navigate with system name GSBP
+                      >
+                        View System Details
+                      </Button>
+                    </MDBox>
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </Grid>
+
+            {/* Hospital Universitario Reina Sofía Card */}
+            <Grid item xs={12} md={3}>
+              <Card>
+                <MDBox p={2}>
+                  <img
+                    src="/plantimage.png"
+                    alt="Photovoltaic System 2"
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <MDBox mt={1}>
+                    <h5 style={{ fontSize: "16px", margin: "0" }}>
+                      Hospital Universitario Reina Sofía
+                    </h5>
+
+                    {/* Location */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <LocationOnIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Location:</b> Av. Menéndez Pidal, Córdoba, Spain
+                      </p>
+                    </MDBox>
+
+                    {/* Capacity */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Capacity:</b> 300 kW
+                      </p>
+                    </MDBox>
+
+                    {/* Strings */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <StorageIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Strings:</b> 120
+                      </p>
+                    </MDBox>
+
+                    <MDBox mt={2} display="flex" justifyContent="flex-end">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#B4E4FF",
+                          color: "black !important",
+                          "&:hover": { backgroundColor: "#1C82AD" },
+                        }}
+                        onClick={() => handleViewDetails("Hospital Universitario Reina Sofía")} // Navigate with system name
+                      >
+                        View System Details
+                      </Button>
+                    </MDBox>
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </Grid>
+
+            {/* Musée Mohammed VI Card */}
+            <Grid item xs={12} md={3}>
+              <Card>
+                <MDBox p={2}>
+                  <img
+                    src="/plantimage.png"
+                    alt="Photovoltaic System 3"
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <MDBox mt={1}>
+                    <h5 style={{ fontSize: "16px", margin: "0" }}>
+                      Musée Mohammed VI d&apos;art moderne
+                    </h5>
+
+                    {/* Location */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <LocationOnIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Location:</b> 2 Av. Moulay Hassan, Rabat, Morocco
+                      </p>
+                    </MDBox>
+
+                    {/* Capacity */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Capacity:</b> 400 kW
+                      </p>
+                    </MDBox>
+
+                    {/* Strings */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <StorageIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Strings:</b> 140
+                      </p>
+                    </MDBox>
+
+                    <MDBox mt={2} display="flex" justifyContent="flex-end">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#B4E4FF",
+                          color: "black !important",
+                          "&:hover": { backgroundColor: "#1C82AD" },
+                        }}
+                        onClick={() => handleViewDetails("Musée Mohammed VI d'art moderne")} // Navigate with system name
+                      >
+                        View System Details
+                      </Button>
+                    </MDBox>
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card>
+                <MDBox p={2}>
+                  <img
+                    src="/plantimage.png"
+                    alt="Photovoltaic System 3"
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <MDBox mt={1}>
+                    <h5 style={{ fontSize: "16px", margin: "0" }}>Plant 4</h5>
+
+                    {/* Location */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <LocationOnIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Location:</b> ....
+                      </p>
+                    </MDBox>
+
+                    {/* Capacity */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Capacity:</b> ....
+                      </p>
+                    </MDBox>
+
+                    {/* Strings */}
+                    <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
+                      <StorageIcon
+                        fontSize="small"
+                        style={{ color: "green", marginRight: "5px" }}
+                      />
+                      <p style={{ fontSize: "12px", margin: "0" }}>
+                        <b>Strings:</b> .....
+                      </p>
+                    </MDBox>
+
+                    <MDBox mt={2} display="flex" justifyContent="flex-end">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#B4E4FF",
+                          color: "black !important",
+                          "&:hover": { backgroundColor: "#1C82AD" },
+                        }}
+                        onClick={() => handleViewDetails("...")} // Navigate with system name
+                      >
+                        View System Details
+                      </Button>
+                    </MDBox>
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </Grid>
+
+            {/* Add other cards similarly */}
+          </Grid>
+        </MDBox>
+
+        {/* Continue with the rest of the dashboard */}
         <MDBox mt={3}>
           <Grid container spacing={1}>
             <Grid item xs={12} md={6}>
@@ -166,14 +446,16 @@ function Dashboard() {
             <Grid item xs={12} md={7}>
               <Projects />
             </Grid>
-            {/* <Grid item xs={12} md={5}>
-              <KpiLineChart startDate={startDate} endDate={endDate} />
-            </Grid> */}
+
+            {/* Add the OnduleurComponent here */}
+            <Grid item xs={12} md={5}>
+              <OnduleurComponent />
+            </Grid>
           </Grid>
         </MDBox>
       </MDBox>
     </DashboardLayout>
   );
-}
+};
 
 export default Dashboard;
