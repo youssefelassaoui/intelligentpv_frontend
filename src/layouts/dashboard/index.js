@@ -15,6 +15,8 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PowerIcon from "@mui/icons-material/Power";
 import StorageIcon from "@mui/icons-material/Storage";
 import OnduleurComponent from "layouts/dashboard/components/OnduleurComponent";
+import PlantStockCards from "layouts/dashboard/PlantStockCards";
+import Footer from "examples/Footer";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState("2024-05-10");
@@ -363,7 +365,7 @@ const Dashboard = () => {
                 <MDBox p={2}>
                   <MDBox mt={2}>
                     <Grid container spacing={1} alignItems="center">
-                      <Grid item xs={5}>
+                      <Grid item xs={6}>
                         <TextField
                           label="Start Date"
                           type="date"
@@ -375,7 +377,7 @@ const Dashboard = () => {
                           fullWidth
                         />
                       </Grid>
-                      <Grid item xs={5}>
+                      <Grid item xs={6}>
                         <TextField
                           label="End Date"
                           type="date"
@@ -387,7 +389,7 @@ const Dashboard = () => {
                           fullWidth
                         />
                       </Grid>
-                      <Grid item xs={2}>
+                      {/* <Grid item xs={2}>
                         <Button
                           variant="contained"
                           onClick={handleFetchData}
@@ -402,11 +404,11 @@ const Dashboard = () => {
                         >
                           Update
                         </Button>
-                      </Grid>
+                      </Grid> */}
                     </Grid>
                   </MDBox>
 
-                  <MDBox mt={2}>
+                  <MDBox mt={1}>
                     {chartData && (
                       <Bar
                         data={chartData}
@@ -436,11 +438,18 @@ const Dashboard = () => {
                 </MDBox>
               </Card>
             </Grid>
-            <Grid item xs={12} md={3.4}>
+
+            {/* Add PlantStockCards component next to OrdersOverview */}
+            <Grid item xs={12} md={3}>
               <OrdersOverview />
+            </Grid>
+
+            <Grid item xs={12} md={3}>
+              <PlantStockCards />
             </Grid>
           </Grid>
         </MDBox>
+
         <MDBox mt={1}>
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} md={7}>
@@ -454,6 +463,7 @@ const Dashboard = () => {
           </Grid>
         </MDBox>
       </MDBox>
+      <Footer />
     </DashboardLayout>
   );
 };

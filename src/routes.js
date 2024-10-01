@@ -44,6 +44,7 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import ManageUsers from "layouts/ManageUsers";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -80,6 +81,14 @@ const routes = [
     route: "/tables/:systemName", // dynamic route for system details
     component: <Tables />,
     icon: null, // This route will not show in the side menu
+  },
+  {
+    type: "collapse",
+    name: "Manage Users",
+    key: "manage-users",
+    icon: <Icon fontSize="small">people</Icon>, // Add an icon for the Manage Users page
+    route: "/manage-users",
+    component: <ManageUsers />, // New route for the Manage Users page
   },
   // {
   //   type: "collapse",

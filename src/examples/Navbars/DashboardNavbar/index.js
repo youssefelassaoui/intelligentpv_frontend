@@ -9,6 +9,9 @@ import MDBox from "components/MDBox";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem"; // To add the Manage Users and Logout options
+import Cookies from "js-cookie";
+import MDTypography from "components/MDTypography";
 import {
   navbar,
   navbarContainer,
@@ -23,6 +26,7 @@ const logo = `${process.env.PUBLIC_URL}/greenenergyparklogo.png`;
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [openMenu, setOpenMenu] = useState(false);
+  const [user, setUser] = useState(null); // User state
   const location = useLocation();
   const route = location.pathname.split("/")[1];
 
@@ -32,11 +36,26 @@ function DashboardNavbar({ absolute, light, isMini }) {
   useEffect(() => {
     setNavbarType(fixedNavbar ? "sticky" : "static");
     setTransparentNavbar(dispatch, false);
+
+    // Retrieve user info from cookies on component load
+    const username = Cookies.get("username");
+    const roles = Cookies.get("roles") ? JSON.parse(Cookies.get("roles")) : [];
+    if (username) {
+      setUser({ username, roles });
+    }
   }, [dispatch, fixedNavbar]);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+
+  const handleLogout = () => {
+    Cookies.remove("authToken");
+    Cookies.remove("username");
+    Cookies.remove("roles");
+    setUser(null);
+    window.location.href = "/authentication/sign-in"; // Redirect to login page after logout
+  };
 
   const renderUnderline = (active) =>
     active && (
@@ -105,33 +124,56 @@ function DashboardNavbar({ absolute, light, isMini }) {
             </Icon>
           </IconButton>
 
-          <IconButton
-            size="small"
-            disableRipple
-            color="inherit"
-            sx={navbarIconButton}
-            aria-controls="notification-menu"
-            aria-haspopup="true"
-            variant="contained"
-            onClick={handleOpenMenu}
-          >
-            <Icon sx={{ color: "inherit" }}>login</Icon>
-          </IconButton>
-        </MDBox>
+          {user ? (
+            <>
+              {/* Replace the login icon with user profile icon */}
+              <IconButton
+                size="large"
+                disableRipple
+                color="info"
+                sx={navbarIconButton}
+                aria-controls="user-menu"
+                aria-haspopup="true"
+                onClick={handleOpenMenu}
+              >
+                <Icon sx={{ color: "inherit" }} size="large">
+                  account_circle
+                </Icon>{" "}
+                {/* Profile Icon */}
+                <MDTypography variant="body1" sx={{ ml: 1 }}>
+                  {user.username} {/* Show the username */}
+                </MDTypography>
+              </IconButton>
 
-        <Menu
-          anchorEl={openMenu}
-          anchorReference={null}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          open={Boolean(openMenu)}
-          onClose={handleCloseMenu}
-          sx={{ mt: 2 }}
-        >
-          {/* Notifications can be added here */}
-        </Menu>
+              <Menu
+                anchorEl={openMenu}
+                open={Boolean(openMenu)}
+                onClose={handleCloseMenu}
+                sx={{ mt: 2 }}
+              >
+                {user.roles.includes("ADMIN") && (
+                  <MenuItem onClick={() => (window.location.href = "/manage-users")}>
+                    Manage Users
+                  </MenuItem>
+                )}
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <IconButton
+              size="small"
+              disableRipple
+              color="inherit"
+              sx={navbarIconButton}
+              aria-controls="notification-menu"
+              aria-haspopup="true"
+              variant="contained"
+              onClick={() => (window.location.href = "/authentication/sign-in")}
+            >
+              <Icon sx={{ color: "inherit" }}>login</Icon> {/* Login Icon if not logged in */}
+            </IconButton>
+          )}
+        </MDBox>
       </Toolbar>
     </AppBar>
   );

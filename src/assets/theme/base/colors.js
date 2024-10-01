@@ -54,9 +54,13 @@ const colors = {
     focus: "#8f93a9",
   },
 
+  // info: {
+  //   main: "#1A73E8",
+  //   focus: "#1662C4",
+  // },
   info: {
-    main: "#1A73E8",
-    focus: "#1662C4",
+    main: "#191A19",
+    focus: "#6EC207",
   },
 
   success: {
@@ -107,9 +111,13 @@ const colors = {
       state: "#495361",
     },
 
+    // info: {
+    //   main: "#49a3f1",
+    //   state: "#1A73E8",
+    // },
     info: {
-      main: "#49a3f1",
-      state: "#1A73E8",
+      main: "#6EC207",
+      state: "#191A19",
     },
 
     success: {
@@ -211,9 +219,13 @@ const colors = {
       text: "#6c757d",
     },
 
+    // info: {
+    //   background: "#aecef7",
+    //   text: "#095bc6",
+    // },
     info: {
-      background: "#aecef7",
-      text: "#095bc6",
+      background: "#191A19",
+      text: "#191A19",
     },
 
     success: {
@@ -245,12 +257,13 @@ const colors = {
   coloredShadows: {
     primary: "#e91e62",
     secondary: "#110e0e",
-    info: "#00bbd4",
+    // info: "#00bbd4",
     success: "#4caf4f",
     warning: "#ff9900",
     error: "#f44336",
     light: "#adb5bd",
     dark: "#404040",
+    info: "#6EC207",
   },
 
   inputBorderColor: "#d2d6da",

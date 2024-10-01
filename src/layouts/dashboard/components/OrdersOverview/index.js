@@ -47,10 +47,10 @@ function OrdersOverview() {
   }, []);
 
   return (
-    <Card sx={{ height: "97.6%" }}>
+    <Card sx={{ height: "100%" }}>
       <MDBox p={4}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4.5}>
+          <Grid item xs={12} md={6}>
             <TextField
               label="Start Date"
               type="date"
@@ -62,7 +62,7 @@ function OrdersOverview() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={4.5}>
+          <Grid item xs={12} md={6}>
             <TextField
               label="End Date"
               type="date"
@@ -74,7 +74,7 @@ function OrdersOverview() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          {/* <Grid item xs={12} md={3}>
             <Button
               variant="contained"
               onClick={handleFetchData}
@@ -89,7 +89,7 @@ function OrdersOverview() {
             >
               Update
             </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
         <MDBox mt={2}>
           {chartData && (

@@ -94,7 +94,7 @@ const MeasureLineChart = ({ plantId }) => {
     <Card sx={{ height: "400px", marginLeft: " 20px", width: "99%", marginTop: "18px" }}>
       <MDBox p={2}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <TextField
               label="Start Date"
               type="date"
@@ -106,7 +106,7 @@ const MeasureLineChart = ({ plantId }) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <TextField
               label="End Date"
               type="date"
@@ -118,7 +118,7 @@ const MeasureLineChart = ({ plantId }) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={2}>
+          {/* <Grid item xs={2}>
             <Button
               variant="contained"
               onClick={fetchMeasures}
@@ -133,7 +133,7 @@ const MeasureLineChart = ({ plantId }) => {
             >
               Update
             </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
         <MDBox mt={1} sx={{ height: "330px" }}>
           {lineChartData && (

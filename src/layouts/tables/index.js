@@ -15,6 +15,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import MeasureLineChart from "./MeasureLineChart";
 import MeasureDataGrid from "./MeasureDataGrid";
+import Footer from "examples/Footer";
 
 const fetchPlantData = async (plantName, startDate, endDate) => {
   try {
@@ -190,7 +191,7 @@ function Tables() {
             <Card>
               <MDBox p={2}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={5}>
+                  <Grid item xs={6}>
                     <TextField
                       label="Start Date"
                       type="date"
@@ -200,7 +201,7 @@ function Tables() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid item xs={6}>
                     <TextField
                       label="End Date"
                       type="date"
@@ -210,7 +211,7 @@ function Tables() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item xs={2}>
+                  {/* <Grid item xs={2}>
                     <Button
                       variant="contained"
                       onClick={handleFetchData1}
@@ -225,7 +226,7 @@ function Tables() {
                     >
                       Update
                     </Button>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
                 <MDBox mt={2}>
                   {chartData1 && (
@@ -269,7 +270,7 @@ function Tables() {
             <Card>
               <MDBox p={2}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={5}>
+                  <Grid item xs={6}>
                     <TextField
                       label="Start Date"
                       type="date"
@@ -279,7 +280,7 @@ function Tables() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid item xs={6}>
                     <TextField
                       label="End Date"
                       type="date"
@@ -289,7 +290,7 @@ function Tables() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item xs={2}>
+                  {/* <Grid item xs={2}>
                     <Button
                       variant="contained"
                       onClick={handleFetchData2}
@@ -304,7 +305,7 @@ function Tables() {
                     >
                       Update
                     </Button>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
                 <MDBox mt={2}>
                   {chartData2 && (
@@ -381,6 +382,7 @@ function Tables() {
           </Grid>
         </Grid>
       </MDBox>
+      <Footer />
     </DashboardLayout>
   );
 }

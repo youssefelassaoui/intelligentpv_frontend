@@ -1,8 +1,23 @@
 import axios from "axios";
+import Cookies from "js-cookie"; // For handling cookies
 
 export const fetchProductionEnergyData = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/api/plants"); // Replace with your API endpoint
+    // Retrieve the JWT token from cookies
+    const token = Cookies.get("authToken"); // Make sure you're using the right cookie key ('authToken')
+
+    // Check if the token is available before making the request
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
+
+    // Set up the headers with the Authorization Bearer token
+    const response = await axios.get("http://localhost:8080/api/plants", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
+    });
+
     const rawData = response.data;
 
     if (!Array.isArray(rawData) || rawData.length === 0) {

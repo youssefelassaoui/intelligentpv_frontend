@@ -1,46 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
-
-// react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
-// @mui/material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon";
-
-// Material Dashboard 2 React components
+import Icon from "@mui/material/Icon"; // Ensure you import Icon here
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import Configurator from "examples/Configurator";
-
-// Material Dashboard 2 React themes
 import theme from "assets/theme";
 import themeRTL from "assets/theme/theme-rtl";
-
-// Material Dashboard 2 React Dark Mode themes
 import themeDark from "assets/theme-dark";
 import themeDarkRTL from "assets/theme-dark/theme-rtl";
-
-// RTL plugins
 import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-
-// Material Dashboard 2 React routes
 import routes from "routes";
-
-// Material Dashboard 2 React contexts
 import { useMaterialUIController, setOpenConfigurator } from "context";
 
-// Images
-import brandWhite from "assets/images/logo-ct.png";
-import brandDark from "assets/images/logo-ct-dark.png";
+// Import your AuthProvider from AuthContext
+import { AuthProvider } from "AuthContext"; // Update the import path accordingly
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const { direction, layout, openConfigurator, darkMode } = controller;
-  const [rtlCache, setRtlCache] = useState(null); // Define setRtlCache here
+  const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
 
   // Cache for the rtl
@@ -49,7 +30,6 @@ export default function App() {
       key: "rtl",
       stylisPlugins: [rtlPlugin],
     });
-
     setRtlCache(cacheRtl);
   }, []);
 
@@ -80,6 +60,7 @@ export default function App() {
       return null;
     });
 
+  // The floating settings button (configsButton)
   const configsButton = (
     <MDBox
       display="flex"
@@ -104,41 +85,43 @@ export default function App() {
     </MDBox>
   );
 
-  return direction === "rtl" ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
-        <CssBaseline />
-        {layout === "dashboard" && (
-          <>
-            <Configurator />
-            {configsButton}
-          </>
-        )}
-        {layout === "vr" && <Configurator />}
-        <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>
-          <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </MDBox>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={darkMode ? themeDark : theme}>
-      <CssBaseline />
-      {layout === "dashboard" && (
-        <>
-          <Configurator />
-          {configsButton}
-        </>
+  return (
+    <AuthProvider>
+      {direction === "rtl" ? (
+        <CacheProvider value={rtlCache}>
+          <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
+            <CssBaseline />
+            {layout === "dashboard" && (
+              <>
+                <Configurator />
+                {configsButton} {/* Render the floating settings button */}
+              </>
+            )}
+            <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>
+              <Routes>
+                {getRoutes(routes)}
+                <Route path="*" element={<Navigate to="/dashboard" />} />
+              </Routes>
+            </MDBox>
+          </ThemeProvider>
+        </CacheProvider>
+      ) : (
+        <ThemeProvider theme={darkMode ? themeDark : theme}>
+          <CssBaseline />
+          {layout === "dashboard" && (
+            <>
+              <Configurator />
+              {configsButton} {/* Render the floating settings button */}
+            </>
+          )}
+          <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </MDBox>
+        </ThemeProvider>
       )}
-      {layout === "vr" && <Configurator />}
-      <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </MDBox>
-    </ThemeProvider>
+    </AuthProvider>
   );
 }

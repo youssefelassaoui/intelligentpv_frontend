@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import axios from "axios";
+import Cookies from "js-cookie"; // Import for handling cookies
 import MDBox from "components/MDBox";
 import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip"; // Import Chip from MUI
@@ -11,7 +12,21 @@ const MeasureDataGrid = ({ plantId }) => {
 
   const fetchMeasures = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/measures");
+      // Retrieve JWT token from cookies
+      const token = Cookies.get("authToken");
+
+      // Ensure token exists
+      if (!token) {
+        throw new Error("Token not found in cookies");
+      }
+
+      // Fetch measures with JWT token in Authorization header
+      const response = await axios.get("http://localhost:8080/api/measures", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach token to the Authorization header
+        },
+      });
+
       const rawData = response.data;
 
       // Filter data based on plantId
