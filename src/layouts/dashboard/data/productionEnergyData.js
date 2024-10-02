@@ -1,39 +1,36 @@
 import axios from "axios";
-import Cookies from "js-cookie"; // For handling cookies
+import Cookies from "js-cookie"; // Assuming you're using js-cookie for handling cookies
 
-export const fetchProductionEnergyData = async () => {
+export const fetchProductionEnergyData = async (startDate, endDate) => {
   try {
-    // Retrieve the JWT token from cookies
-    const token = Cookies.get("authToken"); // Make sure you're using the right cookie key ('authToken')
+    const token = Cookies.get("authToken");
 
-    // Check if the token is available before making the request
     if (!token) {
       throw new Error("Authentication token not found");
     }
 
-    // Set up the headers with the Authorization Bearer token
     const response = await axios.get("http://localhost:8080/api/plants", {
       headers: {
-        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const rawData = response.data;
 
     if (!Array.isArray(rawData) || rawData.length === 0) {
-      return {}; // Return an empty object if no data is returned
+      return {};
     }
 
     // Process the data to group by date and plant name
     const processedData = {};
 
     rawData.forEach((item) => {
-      const date = item.key?.datetime?.split("T")[0]; // Safely access date
+      const date = item.key?.datetime?.split("T")[0]; // Extract the date
       const plantName = item.plantName;
-      const dayEnergy = item.dayEnergy || 0; // Ensure dayEnergy is a valid number
+      const dayEnergy = item.dayEnergy || 0; // Ensure valid number for dayEnergy
 
       if (date && plantName) {
-        // Initialize the date if not present
+        // Initialize date object if not present
         if (!processedData[date]) {
           processedData[date] = {
             "Hospital Universitario Reina Sofía": 0,
@@ -42,12 +39,10 @@ export const fetchProductionEnergyData = async () => {
           };
         }
 
-        // Sum up the dayEnergy for each plantName per date
+        // Accumulate dayEnergy for each plant
         processedData[date][plantName] += dayEnergy;
       }
     });
-
-    console.log("Processed Data:", processedData); // Log the processed data for debugging
 
     return processedData;
   } catch (error) {

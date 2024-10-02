@@ -19,18 +19,34 @@ import PlantStockCards from "layouts/dashboard/PlantStockCards";
 import Footer from "examples/Footer";
 
 const Dashboard = () => {
-  const [startDate, setStartDate] = useState("2024-05-10");
-  const [endDate, setEndDate] = useState("2024-05-20");
-  const [chartData, setChartData] = useState(null);
+  const [startDate, setStartDate] = useState(null); // Initially empty
+  const [endDate, setEndDate] = useState(null); // Initially empty
+  const [chartData, setChartData] = useState(null); // Chart data state
 
   const navigate = useNavigate(); // Initialize navigate for redirection
 
+  const getDateNDaysAgo = (n) => {
+    const date = new Date();
+    date.setDate(date.getDate() - n);
+    return date.toISOString().split("T")[0]; // Return date in YYYY-MM-DD format
+  };
+
   const handleFetchData = async () => {
-    const data = await fetchProductionEnergyData();
+    let finalStartDate = startDate;
+    let finalEndDate = endDate;
+
+    // If no dates are selected, default to the last 10 days
+    if (!startDate || !endDate) {
+      finalStartDate = getDateNDaysAgo(10); // 10 days ago
+      finalEndDate = getDateNDaysAgo(0); // Today
+    }
+
+    const data = await fetchProductionEnergyData(finalStartDate, finalEndDate);
 
     const filteredData = Object.entries(data)
       .filter(
-        ([date]) => new Date(date) >= new Date(startDate) && new Date(date) <= new Date(endDate)
+        ([date]) =>
+          new Date(date) >= new Date(finalStartDate) && new Date(date) <= new Date(finalEndDate)
       )
       .reduce((obj, [key, value]) => {
         obj[key] = {
@@ -73,7 +89,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    handleFetchData();
+    handleFetchData(); // Fetch data on mount and when startDate or endDate changes
   }, [startDate, endDate]);
 
   // Function to handle navigation to the Tables component with system name
@@ -408,28 +424,19 @@ const Dashboard = () => {
                     </Grid>
                   </MDBox>
 
-                  <MDBox mt={1}>
+                  <MDBox mt={2}>
                     {chartData && (
                       <Bar
                         data={chartData}
                         options={{
                           responsive: true,
                           plugins: {
-                            legend: {
-                              position: "top",
-                            },
-                            title: {
-                              display: true,
-                              text: "Daily Energy Production (kW)",
-                            },
+                            legend: { position: "top" },
+                            title: { display: true, text: "Daily Energy Production (kW)" },
                           },
                           scales: {
-                            x: {
-                              stacked: true,
-                            },
-                            y: {
-                              stacked: true,
-                            },
+                            x: { stacked: true },
+                            y: { stacked: true },
                           },
                         }}
                       />
