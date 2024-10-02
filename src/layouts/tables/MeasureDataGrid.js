@@ -8,15 +8,16 @@ import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip"; // Import Chip from MUI
 
 const MeasureDataGrid = ({ plantId }) => {
-  const [tableRows, setTableRows] = useState([]);
-  const [page, setPage] = useState(0); // Page state for pagination
-  const [pageSize, setPageSize] = useState(20); // Page size state
-  const [totalElements, setTotalElements] = useState(0); // Total elements returned by the API
+  const [tableRows, setTableRows] = useState([]); // Store rows of data
+  const [page, setPage] = useState(0); // Current page for pagination
+  const [pageSize, setPageSize] = useState(20); // Number of rows per page
+  const [totalElements, setTotalElements] = useState(0); // Total rows count returned by API
   const [loading, setLoading] = useState(false); // Loading state
 
+  // Function to fetch measures from the server
   const fetchMeasures = async (pageNumber = 0, size = 20) => {
     try {
-      setLoading(true); // Set loading to true while fetching data
+      setLoading(true); // Indicate loading state while fetching data
 
       // Retrieve the token from cookies (or localStorage, depending on your setup)
       const token = Cookies.get("authToken"); // Ensure you have the correct cookie name
@@ -24,7 +25,7 @@ const MeasureDataGrid = ({ plantId }) => {
         throw new Error("Authentication token is missing");
       }
 
-      // Send the request with Authorization headers
+      // Make the request to the API with pagination and plantId filtering
       const response = await axios.get(
         `http://localhost:8080/api/measures/paginated?page=${pageNumber}&size=${size}&plantId=${plantId}`,
         {
@@ -34,9 +35,10 @@ const MeasureDataGrid = ({ plantId }) => {
         }
       );
 
-      const rawData = response.data.content; // Access the paginated content
-      const totalItems = response.data.totalElements; // Get the total number of elements
-      setTotalElements(totalItems);
+      const rawData = response.data.content; // Extract paginated content from response
+      const totalItems = response.data.totalElements; // Get total number of elements
+
+      setTotalElements(totalItems); // Update total elements
 
       // Prepare table rows for DataGrid
       const rows = rawData.map((item, index) => ({
@@ -44,32 +46,32 @@ const MeasureDataGrid = ({ plantId }) => {
         deviceId: item.key.deviceId,
         variable: item.key.variable,
         measure: item.measure,
-        datetime: new Date(item.key.datetime).toLocaleString(), // Format datetime
+        datetime: new Date(item.key.datetime).toLocaleString(), // Format datetime for better readability
       }));
 
-      setTableRows(rows); // Set table rows
+      setTableRows(rows); // Set table rows to state
       setLoading(false); // Set loading to false after fetching
     } catch (error) {
       console.error("Error fetching measures data:", error);
-      setLoading(false); // Ensure loading is stopped on error
+      setLoading(false); // Ensure loading stops if there's an error
     }
   };
 
-  // Fetch measures whenever the page, pageSize, or plantId changes
+  // Fetch measures whenever page, pageSize, or plantId changes
   useEffect(() => {
     if (plantId) {
-      fetchMeasures(page, pageSize); // Pass the page and size dynamically
+      fetchMeasures(page, pageSize); // Call the API with the current page, pageSize, and plantId
     }
   }, [plantId, page, pageSize]);
 
-  // Map variables to specific colors
+  // Define custom variable colors for display
   const variableColorMapping = {
     AoutputVoltage: "#229799",
     AoutputElectricity: "#A04747",
-    // Add other variables and colors here
+    // Add other variables and colors here as needed
   };
 
-  // Columns for the DataGrid
+  // Define columns for the DataGrid
   const columns = [
     { field: "datetime", headerName: "Date/Time", flex: 2 },
     { field: "deviceId", headerName: "Device ID", flex: 1 },
@@ -78,13 +80,13 @@ const MeasureDataGrid = ({ plantId }) => {
       headerName: "Variable",
       flex: 1,
       renderCell: (params) => {
-        const color = variableColorMapping[params.value] || "#000"; // Default to black if no color found
+        const color = variableColorMapping[params.value] || "#000"; // Default color if none is specified
         return (
           <Chip
             label={params.value}
             style={{
               backgroundColor: color,
-              color: "#fff",
+              color: "#fff", // White text on colored background
             }}
           />
         );
@@ -99,23 +101,23 @@ const MeasureDataGrid = ({ plantId }) => {
         <MDBox mt={3} sx={{ height: 360 }}>
           <DataGrid
             loading={loading} // Show loading indicator while data is being fetched
-            rows={tableRows} // This should contain the filtered rows
-            columns={columns}
-            pageSize={pageSize}
-            rowCount={totalElements} // Set total row count from API
+            rows={tableRows} // Filtered rows based on plantId
+            columns={columns} // Columns definition
+            pageSize={pageSize} // Page size
+            rowCount={totalElements} // Total number of rows
             paginationMode="server" // Enable server-side pagination
-            onPageChange={(newPage) => setPage(newPage)} // Handle page change
-            onPageSizeChange={(newSize) => setPageSize(newSize)} // Handle page size change
+            onPageChange={(newPage) => setPage(newPage)} // Handle page changes
+            onPageSizeChange={(newSize) => setPageSize(newSize)} // Handle changes in page size
             rowsPerPageOptions={[5, 10, 20, 50]} // Options for rows per page
-            pagination
-            slots={{ toolbar: GridToolbar }}
+            pagination // Enable pagination
+            slots={{ toolbar: GridToolbar }} // Toolbar for quick filtering, etc.
             slotProps={{
               toolbar: {
                 showQuickFilter: true,
-                quickFilterProps: { debounceMs: 500 },
+                quickFilterProps: { debounceMs: 500 }, // Add debounce to the filter for performance
               },
             }}
-            disableSelectionOnClick
+            disableSelectionOnClick // Disable row selection
           />
         </MDBox>
       </MDBox>
@@ -124,7 +126,7 @@ const MeasureDataGrid = ({ plantId }) => {
 };
 
 MeasureDataGrid.propTypes = {
-  plantId: PropTypes.number.isRequired,
+  plantId: PropTypes.number.isRequired, // plantId is required to filter data
 };
 
 export default MeasureDataGrid;
