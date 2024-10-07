@@ -1,0 +1,87 @@
+.container {
+  margin: 20px auto;
+  max-width: 900px;
+}
+
+.heatmap {
+  display: grid;
+  grid-gap: 5px;
+  align-items: start;
+}
+
+.col {
+  display: grid;
+  grid-gap: 5px;
+}
+
+.cell {
+  height: 15px;
+  width: 100%;
+  position: relative;
+  background: hsl(196deg 36% 95%);
+}
+
+.label {
+  text-align: center;
+  height: 15px;
+  font-size: 14px;
+  color: #000; /* Black font for better visibility */
+}
+
+.horizontal {
+  max-width: 900px;
+  grid-template-rows: repeat(8, 1fr);
+}
+
+.horizontal .col {
+  display: grid;
+  grid-template-columns: repeat(25, 1fr);
+}
+
+.tooltip {
+  position: absolute;
+  display: none;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1;
+  top: 50%;
+  left: 100%;
+  font-size: 18px;
+  border-radius: 4px;
+  min-width: 110px;
+}
+
+.tooltip span {
+  display: block;
+  font-size: 14px;
+}
+
+.tooltip .count {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.cell:hover .tooltip {
+  display: block;
+}
+
+.legend {
+  margin-top: 20px;
+  max-width: 300px;
+}
+
+.legend .cell {
+  height: 15px;
+  width: 100%;
+}
+
+.legend .labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.legend span {
+  font-size: 16px;
+}

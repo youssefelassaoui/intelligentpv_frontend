@@ -7,13 +7,13 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
-import Cookies from "js-cookie"; // To get the token
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import MeasureLineChart from "./MeasureLineChart";
-import MeasureDataGrid from "./MeasureDataGrid";
+import MeasureLineChartE from "./ElectricityMeasure";
+import MeasureLineChartV from "./VoltageMeasure";
 import Footer from "examples/Footer";
+import PowerHeatmap from "./PowerHeatmap";
 
 // Helper function to get the date for the last N days
 const getLastNDays = (n) => {
@@ -26,18 +26,7 @@ const getLastNDays = (n) => {
 // Function to fetch plant data based on plantName and date range
 const fetchPlantData = async (plantName, startDate, endDate) => {
   try {
-    // Retrieve the token from cookies (or localStorage)
-    const token = Cookies.get("authToken");
-    if (!token) {
-      throw new Error("Authentication token is missing");
-    }
-
-    const response = await axios.get("http://localhost:8080/api/plants", {
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the JWT token in the Authorization header
-      },
-    });
-
+    const response = await axios.get("http://localhost:8080/api/plants");
     const rawData = response.data;
 
     // Filter the data based on the plantName and the date range
@@ -47,13 +36,17 @@ const fetchPlantData = async (plantName, startDate, endDate) => {
       return plantMatches && date >= new Date(startDate) && date <= new Date(endDate);
     });
 
-    // Extract labels in the format "Nov 23", "Nov 24", etc., and dayEnergy, totalStringPower
+    // Sort data by datetime to ensure new values are on the right
+    filteredData.sort((a, b) => new Date(a.key.datetime) - new Date(b.key.datetime));
+
+    // Extract the x-axis labels (date + time) and values
     const labels = filteredData.map((item) =>
       new Date(item.key.datetime).toLocaleDateString("en-US", {
-        month: "short",
         day: "numeric",
+        month: "short",
       })
-    ); // x-axis: "Nov 23", "Nov 24"
+    ); // Show only day and month (e.g., "2 Oct")
+
     const fullLabels = filteredData.map((item) => new Date(item.key.datetime).toLocaleString()); // Full date and time for tooltips
     const dayEnergyData = filteredData.map((item) => item.dayEnergy || 0); // Day Energy data
     const totalStringPowerData = filteredData.map((item) => item.totalStringPower || 0); // Total String Power data
@@ -85,6 +78,12 @@ function Tables() {
     "Hospital Universitario Reina Sofía": "Hospital Universitario Reina Sofía",
     "Musée Mohammed VI d'art moderne et contemporain":
       "Musée Mohammed VI d'art moderne et contemporain",
+  };
+
+  const plantIdMapping = {
+    GSBP: 49951765, // Example plantId for GSBP
+    "Hospital Universitario Reina Sofía": 36076361, // Example plantId for Hospital Universitario Reina Sofía
+    "Musée Mohammed VI d'art moderne et contemporain": 36079361, // Example plantId for Musée Mohammed VI
   };
 
   const handleChange = (event, newValue) => {
@@ -131,15 +130,11 @@ function Tables() {
 
   // Fetch data when tab or date range changes
   useEffect(() => {
-    if (selectedTab && startDate1 && endDate1) {
-      handleFetchData1();
-    }
+    handleFetchData1();
   }, [selectedTab, startDate1, endDate1]);
 
   useEffect(() => {
-    if (selectedTab && startDate2 && endDate2) {
-      handleFetchData2();
-    }
+    handleFetchData2();
   }, [selectedTab, startDate2, endDate2]);
 
   return (
@@ -217,10 +212,9 @@ function Tables() {
                           tooltip: {
                             callbacks: {
                               label: function (tooltipItem) {
-                                // Display full datetime on hover using fullLabels
-                                return `${chartData1.fullLabels[tooltipItem.dataIndex]}: ${
-                                  tooltipItem.raw
-                                } kWh`;
+                                // Display full datetime on hover
+                                const date = chartData1.fullLabels[tooltipItem.dataIndex];
+                                return `${date}: ${tooltipItem.raw} kWh`;
                               },
                             },
                           },
@@ -230,6 +224,11 @@ function Tables() {
                             title: {
                               display: true,
                               text: "Date",
+                            },
+                            ticks: {
+                              callback: function (val, index) {
+                                return chartData1.labels[index]; // Display day and month on x-axis
+                              },
                             },
                           },
                           y: {
@@ -290,10 +289,9 @@ function Tables() {
                           tooltip: {
                             callbacks: {
                               label: function (tooltipItem) {
-                                // Display full datetime on hover using fullLabels
-                                return `${chartData2.fullLabels[tooltipItem.dataIndex]}: ${
-                                  tooltipItem.raw
-                                } kW`;
+                                // Display full datetime on hover
+                                const date = chartData2.fullLabels[tooltipItem.dataIndex];
+                                return `${date}: ${tooltipItem.raw} kW`;
                               },
                             },
                           },
@@ -303,6 +301,11 @@ function Tables() {
                             title: {
                               display: true,
                               text: "Date",
+                            },
+                            ticks: {
+                              callback: function (val, index) {
+                                return chartData2.labels[index]; // Display day and month on x-axis
+                              },
                             },
                           },
                           y: {
@@ -323,11 +326,16 @@ function Tables() {
           {/* Other Components */}
           <Grid container spacing={3} alignItems="center">
             <Grid item xs={12} md={6}>
-              <MeasureLineChart plantId={selectedTab} />
+              <MeasureLineChartE plantId={plantIdMapping[selectedTab]} />
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <MeasureDataGrid plantId={selectedTab} />
+              <MeasureLineChartV plantId={plantIdMapping[selectedTab]} />
+            </Grid>
+          </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={7.3}>
+              <PowerHeatmap plantId={plantIdMapping[selectedTab]} />
             </Grid>
           </Grid>
         </Grid>
