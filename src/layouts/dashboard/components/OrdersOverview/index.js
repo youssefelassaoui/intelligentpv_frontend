@@ -139,9 +139,9 @@ function getColorForPlant(plantName) {
   const colors = {
     "Hospital Universitario Reina Sofía": "#7695FF",
     GSBP: "#41B3A2",
-    "Musée Mohammed VI d'art moderne et contemporain": "#D7C3F1",
+    "Musée Mohammed VI d'art moderne et contemporain": "#E4B1F0",
   };
-  return colors[plantName] || "#34A853";
+  return colors[plantName] || "#E4B1F0";
 }
 
 export default OrdersOverview;

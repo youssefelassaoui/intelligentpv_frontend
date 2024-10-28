@@ -65,7 +65,7 @@ function ManageUsersPage() {
   const fetchUsers = async () => {
     try {
       const token = Cookies.get("authToken");
-      const response = await axios.get("http://localhost:8080/api/admin/users", {
+      const response = await axios.get("http://gspb.ddns.net:8081/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -102,7 +102,7 @@ function ManageUsersPage() {
     try {
       const token = Cookies.get("authToken");
       await axios.post(
-        "http://localhost:8080/api/admin/add-user",
+        "http://gspb.ddns.net:8081/api/admin/add-user",
         { username, password },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -119,7 +119,7 @@ function ManageUsersPage() {
     try {
       const token = Cookies.get("authToken");
       await axios.put(
-        `http://localhost:8080/api/admin/users/${selectedUser.id}`,
+        `http://gspb.ddns.net:8081/api/admin/users/${selectedUser.id}`,
         { password },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -135,7 +135,7 @@ function ManageUsersPage() {
   const deleteUser = async (id) => {
     try {
       const token = Cookies.get("authToken");
-      await axios.delete(`http://localhost:8080/api/admin/users/${id}`, {
+      await axios.delete(`http://gspb.ddns.net:8081/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchUsers();

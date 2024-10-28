@@ -32,12 +32,20 @@ function OnduleurComponent() {
 
   // Chip click handler (toggle selection)
   const handleChipClick = (plant) => {
-    setSelectedPlant((prevPlant) => (prevPlant === plant ? null : plant)); // Toggle selection
+    if (selectedPlant !== plant) {
+      setSelectedPlant(plant); // Only update if a different plant is clicked
+    }
   };
 
   // Rendering multiple onduleur images for selected plant
+  // Rendering multiple onduleur images for selected plant
   const renderOnduleurs = () => {
+    if (!selectedPlant || !onduleurImages[selectedPlant]) {
+      return null; // If no plant is selected or it's invalid, render nothing
+    }
+
     const { images, names } = onduleurImages[selectedPlant];
+
     return images.map((imgSrc, index) => (
       <Box key={`${selectedPlant}-${index}`} sx={{ textAlign: "center", mb: 3 }}>
         <img

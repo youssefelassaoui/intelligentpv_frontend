@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon"; // Ensure you import Icon here
+import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import Configurator from "examples/Configurator";
 import theme from "assets/theme";
@@ -14,6 +14,7 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import routes from "routes";
 import { useMaterialUIController, setOpenConfigurator } from "context";
+import PrivateRoute from "./AuthContext/PrivateRoute";
 
 // Import your AuthProvider from AuthContext
 import { AuthProvider } from "AuthContext"; // Update the import path accordingly
@@ -49,15 +50,20 @@ export default function App() {
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
-      if (route.collapse) {
-        return getRoutes(route.collapse);
+      if (route.protected) {
+        // Apply role-based protection based on the route's "protected" field
+        return (
+          <Route
+            path={route.route}
+            key={route.key}
+            element={
+              <PrivateRoute requiredRole={route.requiredRole}>{route.component}</PrivateRoute>
+            }
+          />
+        );
       }
 
-      if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
-      }
-
-      return null;
+      return <Route path={route.route} key={route.key} element={route.component} />;
     });
 
   // The floating settings button (configsButton)
@@ -94,7 +100,7 @@ export default function App() {
             {layout === "dashboard" && (
               <>
                 <Configurator />
-                {configsButton} {/* Render the floating settings button */}
+                {configsButton}
               </>
             )}
             <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>
@@ -111,7 +117,7 @@ export default function App() {
           {layout === "dashboard" && (
             <>
               <Configurator />
-              {configsButton} {/* Render the floating settings button */}
+              {configsButton}
             </>
           )}
           <MDBox sx={{ flexGrow: 1, width: "100%", px: 2, py: 3 }}>

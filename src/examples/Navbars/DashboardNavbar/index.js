@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
@@ -9,7 +9,8 @@ import MDBox from "components/MDBox";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem"; // To add the Manage Users and Logout options
+import MenuItem from "@mui/material/MenuItem";
+import Chip from "@mui/material/Chip"; // Import MUI Chip
 import Cookies from "js-cookie";
 import MDTypography from "components/MDTypography";
 import {
@@ -73,7 +74,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const renderLink = (to, icon, label) => (
     <Link
-      to={to}
+      to={to === "/tables" ? "/tables/GSBP" : to} // Provide a default plant (e.g., GSBP) for the "Plants Details"
       style={{
         display: "flex",
         alignItems: "center",
@@ -126,25 +127,45 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
           {user ? (
             <>
-              {/* Replace the login icon with user profile icon */}
-              <IconButton
-                size="large"
-                disableRipple
-                color="info"
-                sx={navbarIconButton}
-                aria-controls="user-menu"
-                aria-haspopup="true"
-                onClick={handleOpenMenu}
-              >
-                <Icon sx={{ color: "inherit" }} size="large">
-                  account_circle
-                </Icon>{" "}
-                {/* Profile Icon */}
-                <MDTypography variant="body1" sx={{ ml: 1 }}>
-                  {user.username} {/* Show the username */}
-                </MDTypography>
-              </IconButton>
+              {/* User Profile Chip */}
+              <Chip
+                icon={
+                  <Icon sx={{ fontSize: "1.4rem !important", color: "#272932 !important" }}>
+                    account_circle
+                  </Icon>
+                }
+                label={
+                  <MDTypography
+                    variant="body2"
+                    sx={{
+                      fontSize: "2 rem !important", // Smaller font size
+                      fontFamily: '"Gill Sans", sans-serif',
+                      color: "#140303",
+                    }}
+                  >
+                    {user.username}
+                  </MDTypography>
+                }
+                deleteIcon={
+                  <Icon sx={{ fontSize: "1.5rem !important", color: "#140303" }}>
+                    arrow_drop_down
+                  </Icon>
+                }
+                onDelete={handleOpenMenu} // Arrow acts as a dropdown trigger
+                sx={{
+                  backgroundColor: "transparent", // No background color to keep it soft
+                  color: "#508D4E",
+                  pl: 1.5,
+                  pr: 1.5,
+                  borderRadius: "16px",
+                  height: "40px",
+                  position: "absolute", // To position it absolutely
+                  right: "10px", // Adjust as per layout
+                  top: "10px", // Adjust as per layout
+                }}
+              />
 
+              {/* User Menu */}
               <Menu
                 anchorEl={openMenu}
                 open={Boolean(openMenu)}
@@ -153,10 +174,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 {user.roles.includes("ADMIN") && (
                   <MenuItem onClick={() => (window.location.href = "/manage-users")}>
+                    <Icon sx={{ mr: 1 }}>manage_accounts</Icon>
                     Manage Users
                   </MenuItem>
                 )}
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <Icon sx={{ mr: 1 }}>logout</Icon>
+                  Logout
+                </MenuItem>
               </Menu>
             </>
           ) : (

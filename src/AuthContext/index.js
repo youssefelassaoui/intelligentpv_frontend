@@ -7,6 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   // Check for token and user details in cookies and set user on app load
   useEffect(() => {
@@ -21,11 +22,13 @@ export const AuthProvider = ({ children }) => {
       // Set user data from cookies (you can also validate the token with an API call if needed)
       setUser({ username, roles });
     }
+
+    setLoading(false); // Mark loading as done after checking cookies
   }, []);
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/signin", {
+      const response = await axios.post("http://gspb.ddns.net:8081/api/auth/signin", {
         username,
         password,
       });
@@ -65,6 +68,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     delete axios.defaults.headers.common["Authorization"];
   };
+
+  // Render loading state if still checking auth
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
 };

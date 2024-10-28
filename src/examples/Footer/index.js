@@ -20,7 +20,8 @@ function Footer() {
       py={2}
       sx={{
         backgroundColor: "#45474B !important", // Black background
-        color: "white", // White text
+        color: "white",
+        borderRadius: "10px", // White text
       }}
     >
       <MDBox

@@ -53,7 +53,7 @@ const Dashboard = () => {
           "Hospital Universitario Reina Sofía": value["Hospital Universitario Reina Sofía"] || 0,
           GSBP: value["GSBP"] || 0,
           "Musée Mohammed VI d'art moderne et contemporain":
-            value["Musée Mohammed VI d'art moderne et contemporain"] || 0,
+            value["Musée Mohammed VI d art moderne et contemporain"] || 0,
         };
         return obj;
       }, {});
@@ -62,23 +62,20 @@ const Dashboard = () => {
     const datasets = [
       {
         label: "Hospital Universitario Reina Sofía",
-        data: labels.map(
-          (date) => (filteredData[date]["Hospital Universitario Reina Sofía"] || 0) / 1000
-        ), // Convert to kW
+        data: labels.map((date) => filteredData[date]["Hospital Universitario Reina Sofía"] || 0), // Convert to kW
         backgroundColor: "#7695FF",
       },
       {
         label: "GSBP",
-        data: labels.map((date) => (filteredData[date]["GSBP"] || 0) / 1000), // Convert to kW
+        data: labels.map((date) => filteredData[date]["GSBP"] || 0), // Convert to kW
         backgroundColor: "#41B3A2",
       },
       {
         label: "Musée Mohammed VI d'art moderne et contemporain",
         data: labels.map(
-          (date) =>
-            (filteredData[date]["Musée Mohammed VI d'art moderne et contemporain"] || 0) / 1000
+          (date) => filteredData[date]["Musée Mohammed VI d'art moderne et contemporain"] || 0
         ), // Convert to kW
-        backgroundColor: "#D7C3F1",
+        backgroundColor: "#E4B1F0",
       },
     ];
 
@@ -94,7 +91,7 @@ const Dashboard = () => {
 
   // Function to handle navigation to the Tables component with system name
   const handleViewDetails = (systemName) => {
-    navigate(`/tables/${systemName}`); // Navigate to the dynamic route with system name
+    navigate(`/tables/${systemName}`); // This navigates to the dynamic route
   };
 
   return (
@@ -135,7 +132,7 @@ const Dashboard = () => {
                     <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
                       <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Capacity:</b> 500 kW
+                        <b>Capacity:</b> 6 kW
                       </p>
                     </MDBox>
 
@@ -146,7 +143,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Strings:</b> 90
+                        <b>Strings:</b> 3
                       </p>
                     </MDBox>
 
@@ -203,7 +200,7 @@ const Dashboard = () => {
                     <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
                       <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Capacity:</b> 300 kW
+                        <b>Capacity:</b> 1.72 MW
                       </p>
                     </MDBox>
 
@@ -214,7 +211,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Strings:</b> 120
+                        <b>Strings:</b> 274
                       </p>
                     </MDBox>
 
@@ -271,7 +268,7 @@ const Dashboard = () => {
                     <MDBox display="flex" alignItems="center" style={{ margin: "5px 0" }}>
                       <PowerIcon fontSize="small" style={{ color: "green", marginRight: "5px" }} />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Capacity:</b> 400 kW
+                        <b>Capacity:</b>136 kw
                       </p>
                     </MDBox>
 
@@ -282,7 +279,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Strings:</b> 140
+                        <b>Strings:</b> 20
                       </p>
                     </MDBox>
 

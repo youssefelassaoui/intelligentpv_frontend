@@ -9,7 +9,7 @@ export const fetchProductionEnergyData = async (startDate, endDate) => {
       throw new Error("Authentication token not found");
     }
 
-    const response = await axios.get("http://localhost:8080/api/plants", {
+    const response = await axios.get("http://gspb.ddns.net:8081/api/plants", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -35,7 +35,7 @@ export const fetchProductionEnergyData = async (startDate, endDate) => {
           processedData[date] = {
             "Hospital Universitario Reina Sofía": 0,
             GSBP: 0,
-            "Musée Mohammed VI d'art moderne et contemporain": 0,
+            "Musée Mohammed VI d art moderne et contemporain": 0,
           };
         }
 

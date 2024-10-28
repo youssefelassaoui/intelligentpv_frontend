@@ -15,7 +15,7 @@ const KpiLineChart = () => {
 
   const fetchKpiData = async () => {
     try {
-      const kpiResponse = await axios.get("http://localhost:8080/api/kpis");
+      const kpiResponse = await axios.get("http://gspb.ddns.net:8081/api/kpis");
       const kpiData = kpiResponse.data;
 
       const filteredData = kpiData.filter((item) => {

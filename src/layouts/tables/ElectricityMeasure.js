@@ -6,81 +6,181 @@ import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
-import dayjs from "dayjs"; // For handling date formatting
-import XYChartLoader from "./XYChartLoader"; // The loader component
+import dayjs from "dayjs";
+import XYChartLoader from "./XYChartLoader";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
 
 const MeasureLineChart = ({ plantId }) => {
+  const phases = ["AoutputElectricity", "BoutputElectricity", "CoutputElectricity"];
+  const [devices, setDevices] = useState([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [chartData, setChartData] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [startDate, setStartDate] = useState(dayjs().startOf("month").format("YYYY-MM-DD")); // Default to the first day of the current month
-  const [endDate, setEndDate] = useState(dayjs().endOf("day").format("YYYY-MM-DD")); // Default to today
+  const [loading, setLoading] = useState(true);
 
-  // Fetch and aggregate electricity data
-  const fetchMeasures = async () => {
-    setLoading(true); // Set loading state to true before fetching data
+  const [startDate, setStartDate] = useState(dayjs().subtract(5, "day").format("YYYY-MM-DD"));
+  const [endDate, setEndDate] = useState(dayjs().endOf("day").format("YYYY-MM-DD"));
+  const [selectedPhase, setSelectedPhase] = useState(phases[0]);
+
+  // Fetch devices and apply filters based on plantId
+  const fetchDevices = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/measures/paginated`, {
+      const response = await axios.get("http://gspb.ddns.net:8081/api/devices");
+      let filteredDevices = response.data.filter((device) => device.key.plantId === plantId);
+
+      // For GSBP, exclude "Power Sensor" and "Africa Golden Riad"
+      if (plantId === 49951765) {
+        filteredDevices = filteredDevices.filter(
+          (device) => !["Power Sensor", "Africa Golden Riad"].includes(device.deviceName)
+        );
+      }
+
+      setDevices(filteredDevices);
+      if (filteredDevices.length > 0) {
+        setSelectedDeviceId(filteredDevices[0].key.deviceId);
+      }
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+    }
+  };
+
+  // Fetch measures data and filter based on the selected device
+  const fetchMeasures = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("http://gspb.ddns.net:8081/api/measures/paginated", {
         params: {
           plantId,
           page: 1,
-          size: 10000,
-          variableType: "Electricity", // Fetching Electricity data now
+          size: 1000,
+          variableType: "Electricity",
+          variable: selectedPhase,
           startDate: `${startDate}T00:00:00Z`,
           endDate: `${endDate}T23:59:59Z`,
         },
       });
 
-      const rawData = response.data.measures;
+      // Filter data for the selected device
+      let rawData = response.data.measures.filter(
+        (measure) => measure.key.deviceId === selectedDeviceId
+      );
 
-      // Sort by datetime to display the latest data first
-      rawData.sort((a, b) => new Date(b.key.datetime) - new Date(a.key.datetime));
+      rawData.sort((a, b) => new Date(a.key.datetime) - new Date(b.key.datetime));
 
-      // Aggregate data by day and hour
-      const aggregatedData = {};
-      rawData.forEach((item) => {
-        const date = dayjs(item.key.datetime).format("YYYY-MM-DD");
-        const hour = dayjs(item.key.datetime).hour();
-        const key = `${date} ${hour}:00`;
-
-        if (!aggregatedData[key]) {
-          aggregatedData[key] = 0;
-        }
-        aggregatedData[key] += item.measure;
-      });
-
-      // Prepare chart data
-      const labels = Object.keys(aggregatedData); // x-axis labels: day + hour
-      const dataValues = Object.values(aggregatedData); // y-axis values
+      const labels = rawData.map((item) => dayjs(item.key.datetime).format("YYYY-MM-DD HH:mm:ss"));
+      const dataValues = rawData.map((item) => item.measure);
 
       setChartData({
         labels,
         datasets: [
           {
-            label: "Electricity (kWh)", // Update label to show Electricity data
+            label: `${selectedPhase} (Ampere)`,
             data: dataValues,
             borderColor: "#FCCD2A",
             fill: false,
-            tension: 0.1, // Smoother curve
+            tension: 0.1,
           },
         ],
       });
-      setLoading(false); // Set loading state to false after data is fetched
+
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching line chart data:", error.message || error);
-      setLoading(false); // Set loading state to false even if there is an error
+      setLoading(false);
     }
   };
 
-  // Fetch data on component mount and when the date range changes
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Date and Hour",
+        },
+        ticks: {
+          maxTicksLimit: 6,
+          callback: function (value, index, values) {
+            const label = this.getLabelForValue(value);
+            return dayjs(label).format("DD MMM");
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Electricity (Ampere)",
+        },
+      },
+    },
+    plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+      },
+      legend: {
+        display: true,
+        position: "top",
+      },
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem) => `Electricity: ${tooltipItem.raw} A`,
+        },
+      },
+    },
+  };
+
+  // Fetch devices and measures data
+  useEffect(() => {
+    fetchDevices();
+  }, [plantId]);
+
   useEffect(() => {
     fetchMeasures();
-  }, [plantId, startDate, endDate]);
+  }, [plantId, selectedDeviceId, startDate, endDate, selectedPhase]);
 
   return (
-    <Card sx={{ height: "420px", marginLeft: "20px", width: "99%", marginTop: "18px" }}>
+    <Card sx={{ height: "500px", width: "97%", marginTop: "18px", marginLeft: "21px" }}>
       <MDBox p={2}>
+        <h3>Electricity (Ampere)</h3>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <TextField
               label="Start Date"
               type="date"
@@ -90,7 +190,7 @@ const MeasureLineChart = ({ plantId }) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <TextField
               label="End Date"
               type="date"
@@ -100,59 +200,62 @@ const MeasureLineChart = ({ plantId }) => {
               fullWidth
             />
           </Grid>
+          <Grid item xs={4}>
+            <Select
+              value={selectedDeviceId || ""}
+              onChange={(e) => setSelectedDeviceId(e.target.value)}
+              fullWidth
+            >
+              {devices.map((device) => (
+                <MenuItem key={device.key.deviceId} value={device.key.deviceId}>
+                  {device.deviceName}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
         </Grid>
 
-        <MDBox mt={2} sx={{ height: "330px", overflowX: "scroll", position: "relative" }}>
+        <MDBox mt={2} mb={2}>
+          <Stack direction="row" spacing={5} justifyContent="center">
+            {phases.map((phase) => (
+              <Chip
+                key={phase}
+                label={phase}
+                clickable
+                sx={{
+                  backgroundColor: selectedPhase === phase ? "#AEDBCE" : "default",
+                  color: selectedPhase === phase ? "white" : "default",
+                  "&:hover": {
+                    backgroundColor: selectedPhase === phase ? "#50B498" : "#f5f5f5",
+                    color: selectedPhase === phase ? "white" : "default",
+                  },
+                }}
+                onClick={() => setSelectedPhase(phase)}
+              />
+            ))}
+          </Stack>
+        </MDBox>
+
+        <MDBox
+          mt={2}
+          sx={{ height: "310px", width: "98%", overflowX: "scroll", position: "relative" }}
+        >
           {loading ? (
             <MDBox
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                height: "100%", // Make loader fill the entire height
-                width: "100%", // Make loader fill the entire width
+                height: "100%",
+                width: "100%",
               }}
             >
               <XYChartLoader />
             </MDBox>
           ) : chartData ? (
-            <Line
-              data={chartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    title: {
-                      display: true,
-                      text: "Date and Hour",
-                    },
-                    ticks: {
-                      maxTicksLimit: 6, // Limit the number of displayed ticks
-                    },
-                  },
-                  y: {
-                    title: {
-                      display: true,
-                      text: "Electricity (kWh)", // Update y-axis title to reflect electricity
-                    },
-                  },
-                },
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: "top",
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (tooltipItem) => `Electricity: ${tooltipItem.raw} kWh`,
-                    },
-                  },
-                },
-              }}
-            />
+            <Line data={chartData} options={chartOptions} />
           ) : (
-            <p>No data available</p> // Show a message if there is no data
+            <p>No data available</p>
           )}
         </MDBox>
       </MDBox>
@@ -160,9 +263,8 @@ const MeasureLineChart = ({ plantId }) => {
   );
 };
 
-// Define PropTypes validation for plantId
 MeasureLineChart.propTypes = {
-  plantId: PropTypes.number.isRequired, // Define plantId as a required prop
+  plantId: PropTypes.number.isRequired,
 };
 
 export default MeasureLineChart;
