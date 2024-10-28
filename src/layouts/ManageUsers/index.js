@@ -102,7 +102,7 @@ function ManageUsersPage() {
     try {
       const token = Cookies.get("authToken");
       await axios.post(
-        "http://gspb.ddns.net:8081/api/admin/add-user",
+        "/.netlify/functions/proxy/api/admin/add-user",
         { username, password },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -119,7 +119,7 @@ function ManageUsersPage() {
     try {
       const token = Cookies.get("authToken");
       await axios.put(
-        `http://gspb.ddns.net:8081/api/admin/users/${selectedUser.id}`,
+        `/.netlify/functions/proxy/api/admin/users/${selectedUser.id}`,
         { password },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -135,7 +135,7 @@ function ManageUsersPage() {
   const deleteUser = async (id) => {
     try {
       const token = Cookies.get("authToken");
-      await axios.delete(`http://gspb.ddns.net:8081/api/admin/users/${id}`, {
+      await axios.delete(`/.netlify/functions/proxy/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchUsers();
