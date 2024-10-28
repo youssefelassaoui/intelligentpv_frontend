@@ -74,7 +74,7 @@ const MeasureLineChart = ({ plantId }) => {
     try {
       const response = await axios.get("/.netlify/functions/proxy/api/measures/paginated", {
         params: {
-          plantId,
+          plantId: plantId,
           page: 1,
           size: 1000,
           variableType: "Electricity",
@@ -84,32 +84,42 @@ const MeasureLineChart = ({ plantId }) => {
         },
       });
 
-      // Filter data for the selected device
-      let rawData = response.data.measures.filter(
-        (measure) => measure.key.deviceId === selectedDeviceId
-      );
+      // Validate and filter the response data
+      if (response.data && Array.isArray(response.data.measures)) {
+        // Filter data for the selected device
+        let rawData = response.data.measures.filter(
+          (measure) => measure.key.deviceId === selectedDeviceId
+        );
 
-      rawData.sort((a, b) => new Date(a.key.datetime) - new Date(b.key.datetime));
+        rawData.sort((a, b) => new Date(a.key.datetime) - new Date(b.key.datetime));
 
-      const labels = rawData.map((item) => dayjs(item.key.datetime).format("YYYY-MM-DD HH:mm:ss"));
-      const dataValues = rawData.map((item) => item.measure);
+        const labels = rawData.map((item) =>
+          dayjs(item.key.datetime).format("YYYY-MM-DD HH:mm:ss")
+        );
+        const dataValues = rawData.map((item) => item.measure);
 
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: `${selectedPhase} (Ampere)`,
-            data: dataValues,
-            borderColor: "#FCCD2A",
-            fill: false,
-            tension: 0.1,
-          },
-        ],
-      });
-
-      setLoading(false);
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: `${selectedPhase} (Ampere)`,
+              data: dataValues,
+              borderColor: "#FCCD2A",
+              fill: false,
+              tension: 0.1,
+            },
+          ],
+        });
+      } else {
+        console.warn("No measures data available or response format is incorrect.");
+        setChartData({ labels: [], datasets: [] });
+      }
     } catch (error) {
-      console.error("Error fetching line chart data:", error.message || error);
+      console.error(
+        "Error fetching line chart data:",
+        error.response?.data?.message || error.message
+      );
+    } finally {
       setLoading(false);
     }
   };
