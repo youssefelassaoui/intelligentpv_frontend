@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { Line } from "react-chartjs-2";
 import axios from "axios";
 import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
@@ -11,16 +12,38 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import ApexCharts from "react-apexcharts";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 
-const MeasureAreaChart = ({ plantId }) => {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
+
+const MeasureLineChart = ({ plantId }) => {
   const phases = ["AoutputElectricity", "BoutputElectricity", "CoutputElectricity"];
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
-  const [chartData, setChartData] = useState({ series: [], options: {} });
+  const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [startDate, setStartDate] = useState(dayjs().subtract(5, "day").format("YYYY-MM-DD"));
-  const [endDate, setEndDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [endDate, setEndDate] = useState(dayjs().endOf("day").format("YYYY-MM-DD"));
   const [selectedPhase, setSelectedPhase] = useState(phases[0]);
 
   // Fetch devices and apply filters based on plantId
@@ -29,6 +52,7 @@ const MeasureAreaChart = ({ plantId }) => {
       const response = await axios.get("/.netlify/functions/proxy/api/devices");
       let filteredDevices = response.data.filter((device) => device.key.plantId === plantId);
 
+      // For GSBP, exclude "Power Sensor" and "Africa Golden Riad"
       if (plantId === 49951765) {
         filteredDevices = filteredDevices.filter(
           (device) => !["Power Sensor", "Africa Golden Riad"].includes(device.deviceName)
@@ -50,7 +74,7 @@ const MeasureAreaChart = ({ plantId }) => {
     try {
       const response = await axios.get("/.netlify/functions/proxy/api/measures/paginated", {
         params: {
-          plantId,
+          plantId: plantId,
           page: 1,
           size: 1000,
           variableType: "Electricity",
@@ -60,7 +84,9 @@ const MeasureAreaChart = ({ plantId }) => {
         },
       });
 
+      // Validate and filter the response data
       if (response.data && Array.isArray(response.data.measures)) {
+        // Filter data for the selected device
         let rawData = response.data.measures.filter(
           (measure) => measure.key.deviceId === selectedDeviceId
         );
@@ -73,29 +99,81 @@ const MeasureAreaChart = ({ plantId }) => {
         const dataValues = rawData.map((item) => item.measure);
 
         setChartData({
-          options: {
-            chart: { type: "area", zoom: { enabled: true } },
-            xaxis: { categories: labels, title: { text: "Date and Time" } },
-            yaxis: { title: { text: "Electricity (Ampere)" } },
-            dataLabels: { enabled: false },
-            tooltip: { x: { format: "dd MMM HH:mm" } },
-          },
-          series: [
+          labels,
+          datasets: [
             {
-              name: `${selectedPhase} (Ampere)`,
+              label: `${selectedPhase} (Ampere)`,
               data: dataValues,
+              borderColor: "#FCCD2A",
+              fill: false,
+              tension: 0.1,
             },
           ],
         });
       } else {
         console.warn("No measures data available or response format is incorrect.");
-        setChartData({ options: {}, series: [] });
+        setChartData({ labels: [], datasets: [] });
       }
     } catch (error) {
-      console.error("Error fetching area chart data:", error.message);
+      console.error(
+        "Error fetching line chart data:",
+        error.response?.data?.message || error.message
+      );
     } finally {
       setLoading(false);
     }
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Date and Hour",
+        },
+        ticks: {
+          maxTicksLimit: 6,
+          callback: function (value, index, values) {
+            const label = this.getLabelForValue(value);
+            return dayjs(label).format("DD MMM");
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Electricity (Ampere)",
+        },
+      },
+    },
+    plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+      },
+      legend: {
+        display: true,
+        position: "top",
+      },
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem) => `Electricity: ${tooltipItem.raw} A`,
+        },
+      },
+    },
   };
 
   // Fetch devices and measures data
@@ -104,9 +182,7 @@ const MeasureAreaChart = ({ plantId }) => {
   }, [plantId]);
 
   useEffect(() => {
-    if (selectedDeviceId) {
-      fetchMeasures();
-    }
+    fetchMeasures();
   }, [plantId, selectedDeviceId, startDate, endDate, selectedPhase]);
 
   return (
@@ -186,13 +262,10 @@ const MeasureAreaChart = ({ plantId }) => {
             >
               <XYChartLoader />
             </MDBox>
+          ) : chartData ? (
+            <Line data={chartData} options={chartOptions} />
           ) : (
-            <ApexCharts
-              options={chartData.options}
-              series={chartData.series}
-              type="area"
-              height="100%"
-            />
+            <p>No data available</p>
           )}
         </MDBox>
       </MDBox>
@@ -200,8 +273,8 @@ const MeasureAreaChart = ({ plantId }) => {
   );
 };
 
-MeasureAreaChart.propTypes = {
+MeasureLineChart.propTypes = {
   plantId: PropTypes.number.isRequired,
 };
 
-export default MeasureAreaChart;
+export default MeasureLineChart;
