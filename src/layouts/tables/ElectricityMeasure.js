@@ -187,7 +187,12 @@ const MeasureAreaChart = ({ plantId }) => {
               <XYChartLoader />
             </MDBox>
           ) : (
-            <ApexCharts options={chartData.options} series={chartData.series} type="area" height="100%" />
+            <ApexCharts
+              options={chartData.options}
+              series={chartData.series}
+              type="area"
+              height="100%"
+            />
           )}
         </MDBox>
       </MDBox>
