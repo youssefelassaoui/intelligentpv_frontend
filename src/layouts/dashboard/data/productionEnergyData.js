@@ -9,7 +9,7 @@ export const fetchProductionEnergyData = async (startDate, endDate) => {
       throw new Error("Authentication token not found");
     }
 
-    const response = await axios.get("http://gspb.ddns.net:8081/api/plants", {
+    const response = await axios.get("/.netlify/functions/proxy/api/plants", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

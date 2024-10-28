@@ -98,7 +98,7 @@ const PlantStockCards = () => {
   const fetchEnergyDataForPlant = async (plant, plantId) => {
     try {
       const response = await axios.get(
-        `http://gspb.ddns.net:8081/api/plants/energyData/${plantId}`
+        `/.netlify/functions/proxy/api/plants/energyData/${plantId}`
       );
       const { currentWeekEnergy, previousWeekEnergy, currentWeekDailyData } = response.data;
 

@@ -65,7 +65,7 @@ function ManageUsersPage() {
   const fetchUsers = async () => {
     try {
       const token = Cookies.get("authToken");
-      const response = await axios.get("http://gspb.ddns.net:8081/api/admin/users", {
+      const response = await axios.get("/.netlify/functions/proxy/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -49,7 +49,7 @@ const MeasureLineChart = ({ plantId }) => {
   // Fetch devices and apply filters based on plantId
   const fetchDevices = async () => {
     try {
-      const response = await axios.get("http://gspb.ddns.net:8081/api/devices");
+      const response = await axios.get("/.netlify/functions/proxy/api/devices");
       let filteredDevices = response.data.filter((device) => device.key.plantId === plantId);
 
       // For GSBP, exclude "Power Sensor" and "Africa Golden Riad"
@@ -72,7 +72,7 @@ const MeasureLineChart = ({ plantId }) => {
   const fetchMeasures = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://gspb.ddns.net:8081/api/measures/paginated", {
+      const response = await axios.get("/.netlify/functions/proxy/api/measures/paginated", {
         params: {
           plantId,
           page: 1,

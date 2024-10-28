@@ -30,7 +30,7 @@ const getLastNDays = (n) => {
 // Function to fetch plant data based on plantName and date range
 const fetchPlantData = async (plantName, startDate, endDate) => {
   try {
-    const response = await axios.get("http://gspb.ddns.net:8081/api/plants");
+    const response = await axios.get("/.netlify/functions/proxy/api/plants");
     const rawData = response.data;
 
     // Filter the data based on the plantName and the date range
