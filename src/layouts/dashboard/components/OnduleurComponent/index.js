@@ -27,44 +27,40 @@ const onduleurImages = {
 };
 
 function OnduleurComponent() {
-  // State to keep track of selected plant
-  const [selectedPlant, setSelectedPlant] = useState("Hospital Universitario Reina Sofía"); // Default selection is the second plant
+  const [selectedPlant, setSelectedPlant] = useState("Hospital Universitario Reina Sofía");
 
-  // Chip click handler (toggle selection)
   const handleChipClick = (plant) => {
     if (selectedPlant !== plant) {
-      setSelectedPlant(plant); // Only update if a different plant is clicked
+      setSelectedPlant(plant);
     }
   };
 
-  // Rendering multiple onduleur images for selected plant
-  // Rendering multiple onduleur images for selected plant
   const renderOnduleurs = () => {
     if (!selectedPlant || !onduleurImages[selectedPlant]) {
-      return null; // If no plant is selected or it's invalid, render nothing
+      return null;
     }
 
     const { images, names } = onduleurImages[selectedPlant];
 
     return images.map((imgSrc, index) => (
-      <Box key={`${selectedPlant}-${index}`} sx={{ textAlign: "center", mb: 3 }}>
-        <img
-          src={imgSrc}
-          alt={`Onduleur ${names[index]}`}
-          style={{ width: "100%", maxHeight: "150px", objectFit: "contain" }}
-        />
-        {/* Onduleur Name */}
-        <Typography variant="body2" sx={{ mt: 1, fontSize: "12px" }}>
-          {names[index]}
-        </Typography>
-      </Box>
+      <Grid item xs={12} sm={6} md={4} key={`${selectedPlant}-${index}`}>
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <img
+            src={imgSrc}
+            alt={`Onduleur ${names[index]}`}
+            style={{ width: "100%", maxHeight: "150px", objectFit: "contain" }}
+          />
+          <Typography variant="body2" sx={{ mt: 1, fontSize: "12px" }}>
+            {names[index]}
+          </Typography>
+        </Box>
+      </Grid>
     ));
   };
 
   return (
     <MDBox mt={3}>
       <Card>
-        {/* Title with gradient background like in the table example */}
         <MDBox
           mx={2}
           mt={-3}
@@ -74,7 +70,7 @@ function OnduleurComponent() {
           display="flex"
           justifyContent="center"
           alignItems="center"
-          sx={{ backgroundColor: "#B0BEC5", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }} // Using a gray color and shadow
+          sx={{ backgroundColor: "#B0BEC5", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
         >
           <Typography variant="h6" color="white !important">
             Onduleurs by Plant
@@ -83,52 +79,25 @@ function OnduleurComponent() {
 
         <MDBox p={3}>
           <Grid container spacing={2}>
-            {/* Chip Selection */}
             <Grid item xs={12}>
-              <Box display="flex" justifyContent="center" mb={3}>
-                <Chip
-                  label="GSBP"
-                  onClick={() => handleChipClick("GSBP")}
-                  style={{
-                    backgroundColor: selectedPlant === "GSBP" ? "#16325B" : "#78B7D0",
-                    color: "#fff",
-                    marginRight: "10px",
-                    border: selectedPlant === "GSBP" ? "2px solid #1B5E20" : "none",
-                  }}
-                />
-                <Chip
-                  label="Hospital Universitario Reina Sofía"
-                  onClick={() => handleChipClick("Hospital Universitario Reina Sofía")}
-                  style={{
-                    backgroundColor:
-                      selectedPlant === "Hospital Universitario Reina Sofía"
-                        ? "#16325B"
-                        : "#78B7D0",
-                    color: "#fff",
-                    marginRight: "10px",
-                    border:
-                      selectedPlant === "Hospital Universitario Reina Sofía"
-                        ? "2px solid #1B5E20"
-                        : "none",
-                  }}
-                />
-                <Chip
-                  label="Musée Mohammed VI d'art moderne "
-                  onClick={() => handleChipClick("Musée Mohammed VI d'art moderne ")}
-                  style={{
-                    backgroundColor:
-                      selectedPlant === "Musée Mohammed VI d'art moderne " ? "#16325B" : "#78B7D0",
-                    color: "#fff",
-                    border:
-                      selectedPlant === "Musée Mohammed VI d'art moderne "
-                        ? "2px solid #1B5E20"
-                        : "none",
-                  }}
-                />
+              <Box display="flex" justifyContent="center" flexWrap="wrap" mb={3}>
+                {Object.keys(onduleurImages).map((plant) => (
+                  <Chip
+                    key={plant}
+                    label={plant}
+                    onClick={() => handleChipClick(plant)}
+                    style={{
+                      backgroundColor: selectedPlant === plant ? "#16325B" : "#78B7D0",
+                      color: "#fff",
+                      marginRight: "10px",
+                      marginBottom: "10px",
+                      border: selectedPlant === plant ? "2px solid #1B5E20" : "none",
+                    }}
+                  />
+                ))}
               </Box>
             </Grid>
 
-            {/* Onduleur Images with Names */}
             <Grid item xs={12}>
               <Grid container spacing={3} justifyContent="center">
                 {renderOnduleurs()}

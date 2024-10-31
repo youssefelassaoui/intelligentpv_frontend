@@ -124,7 +124,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Location:</b> Ben Guerir 43150, Morocco
+                        <b>Location:</b> Ben Guerir 43150, Mo
                       </p>
                     </MDBox>
 
@@ -192,7 +192,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Location:</b> Av. Menéndez Pidal, Córdoba, Spain
+                        <b>Location:</b> Av. Menéndez Pidal, Córdoba, Sp
                       </p>
                     </MDBox>
 
@@ -260,7 +260,7 @@ const Dashboard = () => {
                         style={{ color: "green", marginRight: "5px" }}
                       />
                       <p style={{ fontSize: "12px", margin: "0" }}>
-                        <b>Location:</b> 2 Av. Moulay Hassan, Rabat, Morocco
+                        <b>Location:</b> 2 Av. Moulay Hassan, Rabat, Mo
                       </p>
                     </MDBox>
 
