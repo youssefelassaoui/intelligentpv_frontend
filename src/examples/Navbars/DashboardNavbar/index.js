@@ -22,7 +22,7 @@ import {
 } from "examples/Navbars/DashboardNavbar/styles";
 import { useMaterialUIController, setTransparentNavbar, setMiniSidenav } from "context";
 
-const logo = `${process.env.PUBLIC_URL}/greenenergyparklogo.png`;
+const logo = `${process.env.PUBLIC_URL}/intelligentpv-logo.png.png`;
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();

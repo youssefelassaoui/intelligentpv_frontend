@@ -9,7 +9,7 @@ import MDButton from "components/MDButton";
 import AuthContext from "../../../AuthContext"; // Ensure correct path
 
 // Import logo
-const logo = `${process.env.PUBLIC_URL}/greenenergyparklogo.png`;
+const logo = `${process.env.PUBLIC_URL}/intelligentpv-logo.png`;
 
 function Basic() {
   const [username, setUsername] = useState("");
