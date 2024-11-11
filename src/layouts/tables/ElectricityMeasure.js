@@ -186,7 +186,7 @@ const MeasureLineChart = ({ plantId }) => {
   }, [plantId, selectedDeviceId, startDate, endDate, selectedPhase]);
 
   return (
-    <Card sx={{ height: "310px", width: "97%", marginTop: "18px", marginLeft: "21px" }}>
+    <Card sx={{ height: "500px", width: "97%", marginTop: "18px", marginLeft: "21px" }}>
       <MDBox p={2}>
         <h3>Electricity (Ampere)</h3>
         <Grid container spacing={2} alignItems="center">
@@ -248,7 +248,7 @@ const MeasureLineChart = ({ plantId }) => {
 
         <MDBox
           mt={2}
-          sx={{ height: "100%", width: "98%", overflowX: "scroll", position: "relative" }}
+          sx={{ height: "310px", width: "98%", overflowX: "scroll", position: "relative" }}
         >
           {loading ? (
             <MDBox
