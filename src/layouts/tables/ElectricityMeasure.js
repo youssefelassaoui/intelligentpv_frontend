@@ -256,7 +256,7 @@ const MeasureLineChart = ({ plantId }) => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                height: "100%",
+                height: "90%",
                 width: "100%",
               }}
             >
