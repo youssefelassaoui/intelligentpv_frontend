@@ -248,7 +248,7 @@ const MeasureLineChart = ({ plantId }) => {
 
         <MDBox
           mt={2}
-          sx={{ height: "300px", width: "98%", overflowX: "scroll", position: "relative" }}
+          sx={{ height: "280px", width: "98%", overflowX: "scroll", position: "relative" }}
         >
           {loading ? (
             <MDBox
