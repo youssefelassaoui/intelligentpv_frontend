@@ -119,7 +119,7 @@ const PowerHeatmap = ({ plantId }) => {
 
   const fetchDevices = async () => {
     try {
-      const response = await axios.get("/.netlify/functions/proxy/api/devices");
+      const response = await axios.get("http://localhost:8081/api/devices");
       let filteredDevices = response.data.filter((device) => device.key.plantId === plantId);
 
       // For GSBP, exclude "Power Sensor" and "Africa Golden Riad"
@@ -141,7 +141,7 @@ const PowerHeatmap = ({ plantId }) => {
   const fetchMeasures = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/.netlify/functions/proxy/api/measures/paginated", {
+      const response = await axios.get("http://localhost:8081/api/measures/paginated", {
         params: {
           plantId,
           page: 1,

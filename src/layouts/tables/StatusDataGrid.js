@@ -80,7 +80,7 @@ const StatusDataGrid = ({ plantId }) => {
       const startDate = dayjs().subtract(7, "day").format("YYYY-MM-DDT00:00:00[Z]");
       const endDate = dayjs().format("YYYY-MM-DDT23:59:59[Z]");
 
-      const response = await axios.get(`/.netlify/functions/proxy/api/measures/status`, {
+      const response = await axios.get(`http://localhost:8081/api/measures/status`, {
         params: {
           plantId,
           page: 1,

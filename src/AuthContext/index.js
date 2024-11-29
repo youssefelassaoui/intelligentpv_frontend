@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("/.netlify/functions/proxy/api/auth/signin", {
+      const response = await axios.post("http://localhost:8081/api/auth/signin", {
         username,
         password,
       });
