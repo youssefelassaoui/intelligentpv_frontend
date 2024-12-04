@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("https://intelligent-pv.onrender.com/api/auth/signin", {
+      const response = await axios.post("http://localhost/api/auth/signin", {
         username,
         password,
       });
